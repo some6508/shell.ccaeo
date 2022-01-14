@@ -16,7 +16,6 @@ export APP_VC=$Version_Code
 export APP_UID=$User_Id
 export APP_ROOT=$Have_ROOT
 export SD_DIR=$SD_PATH
-export HOME=$HOME
 export APP_TMP=$Cache_Dir
 export APP_PATH=$TOOLKIT
 export APP_EXE=$Run_PATH
@@ -2288,7 +2287,7 @@ dumpsys activity activities | sed -n 's/mResumedActivity//p' | sed 's/\/.*//g; s
 dumpsys activity recents | sed -n 's/.*topActivity=//p'
 dumpsys window policy | sed -n 's/.*howing=//p'
 }
-{ `‮` || { txml -a -g '验证失败'; exit $$; }; }&
+#{ `‮` || { txml -a -g '验证失败'; exit $$; }; }&
 ff_ge() { printf "%-50s\n" | tr ' ' '-' 1>&2; }
 xx_ff() { printf "%-35s%s\n" "$1" "$2"; }
 _run() { [[ -s "$1" ]] && . $@ || return $$; }
