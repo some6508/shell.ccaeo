@@ -1,0 +1,121 @@
+#!/data/data/com.termux/files/usr/bin/env bash
+#环境变量 任何终端均可调用termux命令
+export LD_PRELOAD=/data/data/com.termux/files/usr/lib/libtermux-exec.so
+export LD_LIBRARY_PATH=/data/data/com.termux/files/usr/lib
+export PATH=/data/data/com.termux/files/usr/bin:/data/data/com.termux/files/usr/bin/applets
+export HOME=/data/data/com.termux/files/home
+export PREFIX=/data/data/com.termux/files/usr
+#export TMPDIR=/data/data/com.termux/files/usr/tmp
+
+T() {
+_CC=$((RANDOM%7+30))
+echo -e "\e[1;${_CC}m\n╭--------------------------------------------------\n╰- $@"
+}
+
+#邮箱
+_C=3180965797@qq.com
+#名称
+_N=ccaeo
+#本地目录
+DIR=0000
+#仓库链接
+GIT[0]=git@github.com:some6508/shell.ccaeos.git
+#GIT[0]=git@github.com:some6508/all.git
+#
+
+for GIT in ${GIT[@]}
+do TMP=${GIT##*/}; TMP=${TMP%.*}
+if echo $GIT | egrep -q '^git@.*:.*.git'
+then if [[ -f $HOME/.ssh/id_rsa.pub ]]
+	then T "秘钥连接：$GIT"
+		ssh -T ${GIT%:*}
+#		[[ $? -eq 0 ]] || { echo "！秘钥连接失败"; exit 1; }
+	else T "秘钥不存在，自动生成后请上传！"
+		ssh-keygen -t rsa -C "$_C"
+		T "秘钥已生成，请上传"
+		exit 1
+	fi
+fi
+cd $HOME/storage/shared || {
+T "请先在Termux里执行termux-setup-storage！"
+exit 1
+}
+[[ -d $DIR/$TMP ]] || {
+T "不存在$DIR/$TMP，正在创建"
+mkdir -p $DIR/$TMP
+}
+
+cd $DIR/$TMP
+#rm -rf ./.git
+
+[[ -f ./url.sh ]] && . ./url.sh && {
+. ./ccaeo.sh || return $$
+. ./down.sh -run || return $$
+
+d=$(date +%Y%m%d)
+[[ `echo $cv | head -c 8` != $d ]] && cv=${d}00
+let cv=cv+1
+#sed -i "/^export CCAEO_VC=/cexport CCAEO_VC=$cv" ./ccaeo.sh
+
+let y=y+1
+sed -i "/^y=/cy=$y" ./url.sh
+
+sed -i "/^cv=/ccv=$cv" ./url.sh
+m=`md5sum ./ccaeo.sh | cut -d' ' -f1`
+sed -i "/^c=/cc=$m" ./url.sh
+
+#a=`sed -n 's/.*APP_VC=//p' /data/data/shell.ccaeo/files/executor.sh`
+#sed -i "/^vc=/cvc=$a" ./url.sh
+#c=$(pm path "$TMP" | sed 's/package://g')
+c=./$TMP.apk
+e=`stat -c %s "$c"`
+sed -i "/^vs=/cvs=$e" ./url.sh
+d=`md5sum $c | cut -d' ' -f1`
+sed -i "/^v=/cv=$d" ./url.sh
+
+u=`md5sum ./down.sh | cut -d' ' -f1`
+sed -i "/^dm=/cdm=$u" ./url.sh
+
+sed -i "/^| :----: | :----: |/c| :----: | :----: |\n|$cv|$y|" ./README.md
+#cp -a -f $c ./$TMP.apk
+#rm -f ./*.bak
+}
+
+T "设置身份"
+git config --global user.name $_N
+git config --global user.email $_C
+
+T "初始化中"
+git init
+
+T "添加上传"
+git add .
+
+T "获取上传"
+git status | sed 's/new file:/新:/g; s/deleted:/删:/g; s/modified:/更:/g'
+
+T "上传信息"
+git commit -m "$(date +%Y%m%d%H%M)"
+
+#T "获取仓库"
+#git pull origin master
+
+T "链接仓库"
+git remote rm origin
+git remote add origin $GIT
+
+T "开始上传"
+#git push -f origin master
+git push -u origin master
+
+#[[ $? -eq 0 ]] || {
+#T "二次上传"
+#git pull --rebase origin master
+#git push -u origin master
+#}
+
+[[ $? -eq 0 ]] && T "上传成功" || return $$
+T "更新界面：$y"
+
+done
+
