@@ -25,6 +25,7 @@ export RUN=$HOME/run
 export INI=$RUN/ini
 export TMP=$RUN/tmp
 export XML=$RUN/xml
+export PAGE=$XML
 export CCAEO=$RUN/ccaeo.sh
 export BIN=$APP_PATH/bin
 export PREFIX=$RUN/usr
