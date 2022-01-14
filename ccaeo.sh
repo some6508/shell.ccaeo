@@ -52,7 +52,7 @@ export SCRIPT="$APP_PATH"
 export TOOLKIT="$APP_PATH"
 export Data_Dir="$INI"
 [[ -d $TMP ]] && SET=true || SET=false
-$SET && set -x 2>$TMP/CCAEO.LOG && export PS4='$LINENO:	'
+$SET && set -x 2>$TMP/CCAEO.LOG && export PS4='$LINENO:	${FUNCNAME[0]}'
 #$SET && exec 2>$TMP/CCAEO.LOG && set -x && export PS4='$LINENO: '
 if [[ -f $INI/cdn.ini ]]; then
 	export cdn=1
@@ -1419,6 +1419,29 @@ if [[ `md5sum2 "$(pm path $APP_NA | sed 's/package://g')"` != "$v" ]]
 then echo "！软件已有更新啦，请加载"
 fi
 }
+if $SOME; then
+echo [
+cat <<-CCAEO
+{
+	"Action": {
+		"meta": {
+			"confirm": true,
+			"reload": true,
+			"auto-off": false
+		},
+		"title": "当前版本",
+		"desc": "- 页面：$y\n- 软件：$APP_VN（$APP_VC）",
+		"summary": "可点击确定即可刷新，默认每天只刷新一次",
+		"shell": "cq_jz"
+	}
+},
+{
+	"Text": {
+		"value": "<font size=\"30\" color='`ff_ys`'>`A`</font>"
+	}
+},
+CCAEO
+else
 cat <<-CCAEO
 `cxml`
 <group>
@@ -1437,6 +1460,7 @@ cat <<-CCAEO
 	</text>
 </group>
 CCAEO
+fi
 }
 cq_jz() {
 [[ -e $APP_TMP/update ]] || abort "未初始化加载配置"
@@ -1871,7 +1895,28 @@ cxml; cat $XML/zdy.xml
 return $?
 }
 HOME_XML() {
-ccaeo_vc; cat <<-CCAEO
+ccaeo_vc
+if $SOME; then
+cat <<-CCAEO
+{
+	"Actions": {
+		"title": "命令执行",
+		"params": [
+			{
+				"type": "EditText",
+				"name": "run_shell",
+				"title": "可通过iavc -s 命令，去查找命令是否存在",
+				"desc": "已输入命令占用大小：`file_size $RUN/run_shell.sh`",
+				"value-sh": "cat $RUN/run_shell.sh"
+			}
+		],
+		"shell": "run_shell"
+	}
+}
+CCAEO
+echo ]
+else
+cat <<-CCAEO
 <group title="功能" >
 	<page title="Magisk模块查找" desc="查找所有带有.zip格式的文件" config-sh="mod_zip" >
 		<handler>mod_all_zip &#34;\$file&#34;</handler>
@@ -1959,6 +2004,7 @@ ccaeo_vc; cat <<-CCAEO
 	</text>
 </group>
 CCAEO
+fi
 }
 OTG_XML() {
 test_xml
@@ -2288,7 +2334,7 @@ dumpsys activity recents | sed -n 's/.*topActivity=//p'
 dumpsys window policy | sed -n 's/.*howing=//p'
 }
 #{ `‮` || { txml -a -g '验证失败'; exit $$; }; }&
-ff_ge() { printf "%-50s\n" | tr ' ' '-' 1>&2; }
+ff_ge() { printf "%-50s\n" | tr ' ' '-'; }
 xx_ff() { printf "%-35s%s\n" "$1" "$2"; }
 _run() { [[ -s "$1" ]] && . $@ || return $$; }
 run_shell() {
@@ -2302,12 +2348,13 @@ $run_shell
 CCAEO
 wait
 echo "- 已输入\n"
-cat $RUN/run_shell.sh 1>&2
+cat $RUN/run_shell.sh
 ff_ge; echo "- 结果\n"
-S_T; trap 'E_T 命令执行退出代码[$exit_shell] 1>&2' EXIT
+S_T; #trap 'E_T 命令执行退出代码[$exit_shell]' EXIT
 . $RUN/run_shell.sh
 exit_shell=$?
 echo; ff_ge
+E_T "命令执行退出代码[$exit_shell]"
 exit $exit_shell
 }
 file_dir() {
