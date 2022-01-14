@@ -2521,9 +2521,13 @@ else abort "未选择"
 fi
 }
 cxml() {
+if $SOME; then
+echo [
+else
 cat <<-CCAEO
 <?xml version="1.0" encoding="UTF-8" ?>
 CCAEO
+fi
 }
 txml() {
 local align group _group size
