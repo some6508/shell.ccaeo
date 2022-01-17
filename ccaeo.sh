@@ -101,13 +101,14 @@ CCAEO
 toast ">>>正在加载Magisk模块仓库2<<<"
 curl -s --connect-timeout 10 'https://api.github.com/users/Magisk-Modules-Repo/repos?sort=pushed&per_page=100' | egrep 'pushed_at|svn_url' | tr '\n' ' ' | sed -e 's/": /=/g' -e 's/"pushed_at/\npushed_at/g' -e 's/",     "svn_url/" svn_url/g' -e 's/",/"/g' | while read i; do
 if [[ -n $i ]]; then
+	((j++))
 	eval "$i"
 	name=${svn_url##*/}
 	mod_time=`_time -tz $pushed_at`
 #	eval "$(curl -s --connect-timeout 10 "${svn_url//github.com/api.github.com\/repos}/commits" | grep -m 1 'sha' | sed -n 's/.*"sha": "/sha="/p')"
-	[[ -e $MOD_DIR/$name ]] && desc='已安装'
+	[[ -e $MOD_DIR/$name ]] && desc='该模块已安装'
 	cat <<-CCAEO
-		<action title="$name" id="@$name" reload="@$name" >
+		<action title="$j·$name" id="@$name" reload="@$name" >
 			<set>mod_http_all &#34;$svn_url/archive/master.zip&#34; &#34;$name&#34;</set>
 			<summary>- 获取时间：${mod_time:-获取失败}</summary>
 			<desc>$desc</desc>
@@ -205,7 +206,7 @@ elif [[ -f $INI/ge_shi.ini ]]; then
 						<set>ge_shi -d &#34;$ge_shi&#34;</set>
 						<desc>模块大小：$_size&#x000A;创建时间：$_time&#x000A;模块目录：${ge_shi%/*}</desc>
 						<params>
-							<param name="_ge" label="选项" title="注意：安装仅支持APK和Magisk模块" options-sh="echo '1|安装\n2|删除\n3|移动\n4|跳转'" />
+							<param name="_ge" label="选项" title="注意：安装仅支持	APK	和	Magisk	模块" options-sh="echo '1|安装\n2|删除\n3|移动\n4|跳转'" />
 							<param name="_mv" title="移动目录" value="$ge_shi" type="folder" editable="true" />
 						</params>
 					</action>
@@ -398,7 +399,7 @@ cat <<-CCAEO >$1
 		<summary>可点击确定即可刷新，默认每天只刷新一次</summary>
 	</action>
 </group>
-`txml -g -s 20 '加载失败，可点击刷新仓库'`
+`txml -g -s 25 '加载失败，可点击刷新仓库'`
 CCAEO
 }
 xp_http() {
@@ -498,14 +499,14 @@ cat <<-CCAEO
 		<param name="xp_a" label="下载版本" options-sh="echo '$_version'" />
 		<param name="xp_b" label="操作选项" options-sh="echo '1|下载安装\n2|仅下载\n3|打开链接'" />
 		<param name="_rm" label="下载安装后删除文件" type="switch" />
-		<param name="_js" label="使用CDN加速下载" type="switch" value="$cdn" />
+		<param name="_js" label="使用	CDN	加速下载" type="switch" value="$cdn" />
 	</params>
 </action>
 CCAEO
 }
 if [[ `du $XP_HTTP | cut -f 1` -le 4 ]]; then
 	toast ">>>加载Xposed模块仓库失败<<<"
-	txml -g -s 20 '加载失败，可点击刷新仓库'
+	txml -g -s 25 '加载失败，可点击刷新仓库'
 	return $$
 fi
 toast "<<<正在解析Xposed模块仓库>>>"
@@ -518,7 +519,7 @@ for i in `. $XP_HTTP -sj | sed 's/"//g'`; do
 		if [[ ${code[1]} -gt `app_vc $i` ]]; then
 			if [[ -z $f ]]; then
 				f=0
-				txml -s 35 '模块有更新（AAA）'
+				txml -s 25 '模块有更新（AAA）'
 			fi
 			xp_cat
 			((AAA++))
@@ -533,7 +534,7 @@ for i in ${http_xp[@]}; do
 	. $XP_HTTP $i
 	if [[ -z $l ]]; then
 		l=0
-		txml -s 35 '模块已安装（AXP）'
+		txml -s 25 '模块已安装（AXP）'
 	fi
 	xp_cat
 	((AXP++))
@@ -551,7 +552,7 @@ for i in ${xp_http[@]}; do
 	if [[ $n -ge $_num ]]; then
 		if [[ -z $x ]]; then
 			x=0
-			txml -s 35 '模块未安装（XPA）'
+			txml -s 25 '模块未安装（XPA）'
 		fi
 		for o in `seq "$_num"`; do
 			echo
@@ -665,14 +666,14 @@ cat <<-CCAEO
 		<param name="xp_a" label="下载版本" options-sh="echo '$_releaseAssets'" />
 		<param name="xp_b" label="操作选项" options-sh="echo '1|下载安装\n2|仅下载\n3|打开链接'" />
 		<param name="_rm" label="下载安装后删除文件" type="switch" />
-		<param name="_js" label="使用CDN加速下载" type="switch" value="$cdn" />
+		<param name="_js" label="使用	CDN	加速下载" type="switch" value="$cdn" />
 	</params>
 </action>
 CCAEO
 }
 if [[ `du $LSP_HTTP | cut -f 1` -le 4 ]]; then
 	toast ">>>加载LSPosed模块仓库失败<<<"
-	txml -g -s 20 '加载失败，可点击刷新仓库'
+	txml -g -s 25 '加载失败，可点击刷新仓库'
 	return $$
 fi
 toast "<<<正在解析LSPosed模块仓库>>>"
@@ -685,7 +686,7 @@ do if [[ -d $DA_DIR/$i ]]
 		if [[ $releases != *`app_vn $i`* ]]
 		then if [[ -z $f ]]
 			then f=0
-				txml -s 35 '模块有更新（AAA）'
+				txml -s 25 '模块有更新（AAA）'
 			fi
 			xp_cat
 			((AAA++))
@@ -699,7 +700,7 @@ for i in ${http_lsp[@]}
 do . $LSP_HTTP $i
 	if [[ -z $l ]]
 	then l=0
-		txml -s 35 '模块已安装（ALSP）'
+		txml -s 25 '模块已安装（ALSP）'
 	fi
 	xp_cat
 	((ALSP++))
@@ -709,7 +710,7 @@ for i in ${lsp_http[@]}
 do . $LSP_HTTP $i
 	if [[ -z $j ]]
 	then j=0
-		txml -s 35 '模块未安装（LSPA）'
+		txml -s 25 '模块未安装（LSPA）'
 	fi
 	xp_cat
 	((LSPA++))
@@ -730,10 +731,10 @@ cxml; cat <<-CCAEO
 	</action>
 </group>
 <group>
-	<action title="全局CDN加速" desc="仅支持带有CDN加速下载的选项" id="@cdn" reload="@cdn" auto-off="true" >
+	<action title="全局	CDN	加速" desc="仅支持带有	CDN	加速下载的选项" id="@cdn" reload="@cdn" auto-off="true" >
 		<set>[[ \$_js = 1 ]] &#38;&#38; touch \$INI/cdn.ini || rm -f \$INI/cdn.ini</set>
 		<params>
-			<param name="_js" label="使用CDN加速下载" type="switch" value="$cdn" />
+			<param name="_js" label="使用	CDN	加速下载" type="switch" value="$cdn" />
 		</params>
 	</action>
 	<action title="自定义主题颜色" desc="仅首次使用需要重启生效" id="@se" reload="@se" >
@@ -844,12 +845,12 @@ S_T; trap 'E_T -t 加载Release' EXIT; cxml
 txml -g '获取失败原因（可能）：&#x000A;1、连接超过10秒为超时。2、没有获取到Release。3、链接输入错误？'
 cat <<-CCAEO
 <group>
-	<action title="获取链接Release" reload="true" auto-off="true" >
+	<action title="获取链接	Release" reload="true" auto-off="true" >
 		<set>git_cat</set>
 		<params>
 			<param name="git_http" label="已收集有" multiple="multiple" options-sh="git_http" />
 			<param name="_git" label="使用收集？" type="switch" />
-			<param name="git_xml" title="请输入" placeholder="例：https://github.com/LSPosed/LSPosed" value-sh="cat \$APP_DOWN/git_release.ini" />
+			<param name="git_xml" title="请输入" desc="后面的	releases	可以不加" placeholder="例：https://github.com/LSPosed/LSPosed/releases" value-sh="cat \$APP_DOWN/git_release.ini" />
 		</params>
 	</action>
 </group>
@@ -912,9 +913,9 @@ do if [[ "$i" = browser_download_url* ]]
 done
 cat <<-CCAEO
 			</param>
-			<param name="xz" label="选项" title="注意：下载安装仅支持APK和Magisk模块" options-sh="echo '1|下载安装\n2|仅下载'" />
+			<param name="xz" label="选项" title="注意：下载安装仅支持	APK	和	Magisk	模块" options-sh="echo '1|下载安装\n2|仅下载'" />
 			<param name="_rm" label="下载安装后删除文件" type="switch" />
-			<param name="_js" label="使用CDN加速下载" type="switch" value="$cdn" />
+			<param name="_js" label="使用	CDN	加速下载" type="switch" value="$cdn" />
 		</params>
 		<desc>最新版本：$tag_name·共有：$n个</desc>
 		<summary>- 上传时间：`_time -tz $updated_at`</summary>
@@ -951,11 +952,11 @@ mod_all_zip "$mod/$_dir"
 auto_run() {
 cxml; cat <<-CCAEO
 <group>
-	<action title="一键安装LSPosed" reload="true" >
+	<action title="一键安装	LSPosed" reload="true" >
 		<set>xp_lsp</set>
-		<desc>一键安装/升级 Riru（可选）、LSPosed框架</desc>
+		<desc>一键安装/升级	Riru（可选）、LSPosed框架</desc>
 		<params>
-			<param name="riru" label="不安装Riru" type="switch" />
+			<param name="riru" label="不安装	Riru" type="switch" />
 		</params>
 	</action>
 </group>
@@ -966,7 +967,7 @@ axm_all() {
 echo "progress:[-1/0]"
 if [[ "$1" = *.zip ]]
 then mod_all_zip "$1"
-else unzip -l "$1" | fgrep -q 'AndroidManifest.xml' || abort "不是APK应用"
+else unzip -l "$1" | fgrep -q 'AndroidManifest.xml' || abort "不是	APK	应用"
 	echo ${axm_:-com.android.vending} >$INI/axm.ini
 	ii=`cat $INI/axm.ini`
 	ss=`wc -c < "$1"`
@@ -1003,17 +1004,17 @@ axm_all $Rm "$apk_dir/$_dir"
 axm_uzji() {
 S_T; trap 'E_T -t 加载收集' EXIT; cxml
 [[ -s $INI/axm.ini ]] && echo 'com.android.vending' >$INI/axm.ini
-txml -a -s 20 '均为手动收集'
+txml -a -s 25 '均为手动收集'
 if [[ $1 = _app ]]
 then cat <<-CCAEO
 <group>
-	<page title="Magisk模块收集" config-sh="axm_uzji _mod" >
+	<page title="Magisk	模块收集" config-sh="axm_uzji _mod" >
 		<handler>CQ</handler>
 		<menu type="refresh">刷新界面</menu>
 		<menu type="exit">关闭页面</menu>
 		<option type="default" id="1">重启手机</option>
 	</page>
-	<page title="Xposed模块收集" config-sh="axm_uzji _xp" >
+	<page title="Xposed	模块收集" config-sh="axm_uzji _xp" >
 		<handler>CQ</handler>
 		<menu type="refresh">刷新界面</menu>
 		<menu type="exit">关闭页面</menu>
@@ -1063,6 +1064,7 @@ cxml; cat <<-CCAEO
 </group>
 <group title="Gitee" >
 	<page title="Termux运行GNU/Linux" link="https://gitee.com/mo2/linux" />
+	<page title="蓝奏云下载地址解析API" link="https://gitee.com/web/lanzou" />
 </group>
 <group title="GitHub" >
 	<page title="NekoX（TG猫报）" link="https://github.com/NekoX-Dev/NekoX" />
@@ -1077,6 +1079,7 @@ cxml; cat <<-CCAEO
 <group title="其他" >
 	<page title="酷狗音乐内测版" link="https://kugou.fun/" />
 	<page title="异星软件空间" link="https://www.yxssp.com/" />
+	<page title="平平免费API" link="https://api.pingping6.com/" />
 </group>
 CCAEO
 }
@@ -1142,7 +1145,7 @@ esac
 fu_jgn() {
 cxml; cat <<-CCAEO
 <group title="界面" >
-	<page title="自定义界面" desc="需要自写xml" config-sh="zdy_xml" >
+	<page title="自定义界面" desc="需要自写	xml" config-sh="zdy_xml" >
 		<handler>CQ</handler>
 		<menu type="refresh">刷新界面</menu>
 		<menu type="exit">关闭页面</menu>
@@ -1151,7 +1154,7 @@ cxml; cat <<-CCAEO
 			if [[ -f $XML/zdy.xml ]]; then
 				echo 'unlocked'
 			else
-				echo "请在$XML创建zdy.xml文件"
+				echo "请在	$XML	创建	zdy.xml	文件"
 			fi
 		</lock>
 	</page>
@@ -1173,13 +1176,13 @@ cxml; cat <<-CCAEO
 		<menu type="exit">关闭页面</menu>
 		<option type="default" id="1">重启手机</option>
 	</page>
-	<page title="ROM校验及刷入" config-sh="rom_zip" >
+	<page title="ROM	校验及刷入" config-sh="rom_zip" >
 		<handler>CQ</handler>
 		<menu type="refresh">刷新界面</menu>
 		<menu type="exit">关闭页面</menu>
 		<option type="default" id="1">重启手机</option>
 	</page>
-	<page title="ROM地址获取" config-sh="miui_rom" visible="[[ -f $DA_DIR/com.android.updater/shared_prefs/version_json.xml ]] &#38;&#38; echo 1 || echo 0" >
+	<page title="ROM	地址获取" config-sh="miui_rom" visible="[[ -f $DA_DIR/com.android.updater/shared_prefs/version_json.xml ]] &#38;&#38; echo 1 || echo 0" >
 		<handler>CQ</handler>
 		<menu type="refresh">刷新界面</menu>
 		<menu type="exit">关闭页面</menu>
@@ -1187,12 +1190,12 @@ cxml; cat <<-CCAEO
 	</page>
 </group>
 <group title="弹窗" >
-	<action title="私人DNS" id="@dns" reload="@dns" >
+	<action title="私人	DNS" id="@dns" reload="@dns" >
 		<set>dns_cat -n</set>
 		<params>
-			<param name="g" label="DNS开关" type="switch" value-sh="settings get global private_dns_mode | grep -c 'hostname'" />
+			<param name="g" label="DNS	开关" type="switch" value-sh="settings get global private_dns_mode | grep -c 'hostname'" />
 			<param name="dns" label="已收集" options-sh="dns_cat" />
-			<param name="_dns" title="自定义设置DNS" value-sh="settings get global private_dns_specifier | grep -iv 'null'" />
+			<param name="_dns" title="自定义设置	DNS" value-sh="settings get global private_dns_specifier | grep -iv 'null'" />
 		</params>
 	</action>
 	<action title="动画缩放" id="@pwta" reload="@pwta" >
@@ -1204,28 +1207,28 @@ cxml; cat <<-CCAEO
 			<param name="a" label="动画时长" required="true" value-sh="settings get global animator_duration_scale" />
 		</params>
 	</action>
-	<action title="yc调度模式切换" id="@yc" reload="@yc" auto-off="true" visible="[[ -d \$MOD_DIR/uperf/script ]] &#38;&#38; echo 1 || echo 0" >
+	<action title="yc	调度模式切换" id="@yc" reload="@yc" auto-off="true" visible="[[ -d \$MOD_DIR/uperf/script ]] &#38;&#38; echo 1 || echo 0" >
 		<set>yc_sh -e</set>
 		<params>
 			<param name="_yc" label="模式" desc="部分版本无法切换极速模式" options-sh="echo 'powersave|省电模式\nbalance|均衡模式\nperformance|性能模式\nfast|极速模式'" value-sh="yc_sh -g" />
 			<param name="yc" readonly="true" value-sh="yc_sh -s" />
 		</params>
 	</action>
-	<action title="电池优化黑白名单" id="@dc" reload="@dc" >
+	<action title="电池优化	黑白	名单" id="@dc" reload="@dc" >
 		<params>
-			<param name="package2" label="黑名单" desc="部分应用不支持黑名单" separator="," type="app" multiple="multiple" options-sh="dumpsys deviceidle whitelist | cut -d',' -f2" />
+			<param name="package2" label="黑名单" desc="部分应用不支持	黑名单" separator="," type="app" multiple="multiple" options-sh="dumpsys deviceidle whitelist | cut -d',' -f2" />
 			<param name="package" label="白名单" separator="," type="app" multiple="multiple" options-sh="pm list package | cut -d':' -f2" />
 		</params>
 		<set>ddw</set>
 	</action>
-	<action title="MIUI步数增加" id="@buuu" reload="@buuu" >
+	<action title="MIUI	步数增加" id="@buuu" reload="@buuu" >
 		<params>
 			<param name="buuu" title="滑动选择步数" type="seekbar" min="1" max="99999" value="10000" />
 			<param name="_buuu" title="自定义步数" desc="一次性修改过多可能会封号" placeholder="请输入 1～99999 的步数" />
 		</params>
 		<set>buuu</set>
 	</action>
-	<action title="HttpCanary证书" id="@hc" reload="@hc" visible="[[ -d \$DA_DIR/com.guoshi.httpcanary.premium ]] &#38;&#38; echo 1 || echo 0" >
+	<action title="HttpCanary	证书" id="@hc" reload="@hc" visible="[[ -d \$DA_DIR/com.guoshi.httpcanary.premium ]] &#38;&#38; echo 1 || echo 0" >
 		<params>
 			<param name="_hc" label="操作" options-sh="echo '1|安装\n2|移除'" />
 		</params>
@@ -1263,7 +1266,7 @@ fi
 miui_rom() {
 cxml; ROM_PROP
 eval "$(sed -n '/current_version/p' $DA_DIR/com.android.updater/shared_prefs/version_json.xml | sed -e 's/&quot;:/=/g' -e 's/,&quot;METAHASH/"`\n/g' -e 's/,&quot;/\n/g' -e 's/&quot;/"/g' -e 's/{"/`echo "/g' | sed -n '/type=/p; /^device=/p; /^name=/p; /^md5=/p; /^codebase=/p; /^filename=/p; /^filesize=/p; /^FILESIZE=/p')"
-txml -a -g -s 35 "$NAME（$DEVICE）"
+txml -a -g -s 25 "$NAME（$DEVICE）&#x000A;`file_time $DA_DIR/com.android.updater/shared_prefs/version_json.xml`"
 _rom() {
 if [[ -n $md5 ]]
 then cat <<-CCAEO
@@ -1359,11 +1362,11 @@ dns_cat () {
 dns="${_dns:-$dns}"
 if [[ $1 = -n ]]
 then [[ -z $dns ]] && abort "未选择或未输入"
-	[[ $g = 0 ]] && settings put global private_dns_mode 'off' && abort "已关闭DNS"
+	[[ $g = 0 ]] && settings put global private_dns_mode 'off' && abort "已关闭	DNS"
 	if ping -c 5 -A -w 1 "$dns" 1>&2
 	then
 		settings put global private_dns_mode 'hostname'
-		settings put global private_dns_specifier "$dns" && echo "- 已将DNS设置为	$dns" || abort "DNS设置失败"
+		settings put global private_dns_specifier "$dns" && echo "- 已将	DNS	设置为	$dns" || abort "DNS	设置失败"
 		return 0
 	else
 		abort "连接	$dns	失败"
@@ -1411,12 +1414,12 @@ esac
 ccaeo_vc() {
 _run $RUN/url.sh
 A() {
-[[ -e $APP_TMP/update ]] || echo "！未初始化加载配置，请重新加载"
+[[ -e $APP_TMP/update ]] || echo "！未初始化加载配置\n，请前往主页重新加载"
 if [[ `md5sum2 $CCAEO` != "$c" ]]
-then echo "！配置已有更新啦，请加载"
+then echo "！配置已有更新，请加载"
 fi
 if [[ `md5sum2 "$(pm path $APP_NA | sed 's/package://g')"` != "$v" ]]
-then echo "！软件已有更新啦，请加载"
+then echo "！软件已有更新，请加载"
 fi
 }
 if $SOME; then
@@ -1454,8 +1457,8 @@ cat <<-CCAEO
 <group>
 	<text>
 		<slices>
-			<slice activity="$APP_AP" color="`ff_ys`" size="30" u="1">`A`</slice>
-			<slice activity="$APP_AP" color="`ff_ys`" break="true" size="25" u="1">功能基于MIUI适配，其他机型可能无效</slice>
+			<slice activity="$APP_AP" color="`ff_ys`" size="25">`A`</slice>
+			<slice activity="$APP_AP" color="`ff_ys`" break="true" size="25">功能基于MIUI适配，其他机型可能无效</slice>
 		</slices>
 	</text>
 </group>
@@ -1672,7 +1675,7 @@ then if XZ -# "$js$1" "$ZIP/$mod_file"
 	then DIR=`7za x "$ZIP/$mod_file" -o$ZIP -y | egrep -v '/' | sed -n 's/Extracting  //p'`
 		cd "$ZIP/$DIR"
 		_u='./META-INF/com/google/android'
-		fgrep -q '#MAGISK' $_u/updater-script || abort "不是	Magisk模块"
+		fgrep -q '#MAGISK' $_u/updater-script || abort "不是	Magisk	模块"
 		egrep -q '/util_functions.sh$' $_u/update-binary || {
 		error "！正在添加	update-binary"
 		cat <<-'CCAEO' >$_u/update-binary
@@ -1727,7 +1730,7 @@ fi
 }
 test_xml() {
 cxml
-txml -a -g -s 50 '　　开　发　中　　'
+txml -a -g -s 50 '		开	发	中		'
 exit $$
 }
 mod_git() {
@@ -1744,7 +1747,7 @@ cat <<-CCAEO
 		<desc>- 刷新时间：$mod_date</desc>
 		<summary>可点击确定即可刷新，默认每天只刷新一次</summary>
 	</action>
-	<page title="Magisk模块仓库2" config-sh="mod_page" >
+	<page title="Magisk模块仓库2" desc="只能加载出前	99	个模块" config-sh="mod_page" >
 		<handler>mod_all_zip &#34;\$file&#34;</handler>
 		<menu type="refresh">刷新界面</menu>
 		<menu type="exit">关闭页面</menu>
@@ -1756,7 +1759,7 @@ cat <<-CCAEO
 CCAEO
 if [[ `du $MOD_HTTP | cut -f 1` -le 4 ]]
 then toast ">>>加载Magisk模块仓库失败<<<"
-	txml -g -s 20 '加载失败，可点击刷新仓库'
+	txml -g -s 25 '加载失败，可点击刷新仓库'
 	return $$
 fi
 toast "<<<正在解析Magisk模块仓库>>>"
@@ -1779,7 +1782,7 @@ cat <<-CCAEO
 		<param name="mod_b" title="文件链接" value="$zip_url" />
 		<param name="mod_a" label="操作选项" options-sh="echo '1|下载安装\n2|仅下载\n3|打开文件链接'" />
 		<param name="_rm" label="下载安装后删除文件" type="switch" />
-		<param name="_js" label="使用CDN加速下载" type="switch" value="$cdn" />
+		<param name="_js" label="使用	CDN	加速下载" type="switch" value="$cdn" />
 	</params>
 </action>
 CCAEO
@@ -1807,7 +1810,7 @@ do . $MOD_HTTP $mod_u
 	eval `mod_grep $TMP/prop/$mod_u`
 	if [[ -z $a ]]
 	then a=0
-		txml -s 35 '模块有更新（MODS）'
+		txml -s 25 '模块有更新（MODS）'
 	fi
 	mod_xml
 	((MODS++))
@@ -1821,7 +1824,7 @@ do [[ -f $TMP/prop/${mod##*/} ]] || continue
 	mod_time=`file_time "$mod_mp"`
 	if [[ -z $b ]]
 	then b=0
-		txml -s 35 '模块已安装（AMOD）'
+		txml -s 25 '模块已安装（AMOD）'
 	fi
 	mod_xml
 	((AMOD++))
@@ -1833,7 +1836,7 @@ do . $MOD_HTTP $id
 	[[ -f $TMP/prop/$id ]] && eval `mod_grep $TMP/prop/$id`
 	if [[ -z $c ]]
 	then c=0
-		txml -s 35 '模块未安装（MODA）'
+		txml -s 25 '模块未安装（MODA）'
 	fi
 	mod_xml
 	((MODA++))
@@ -1918,7 +1921,7 @@ echo ]
 else
 cat <<-CCAEO
 <group title="功能" >
-	<page title="Magisk模块查找" desc="查找所有带有.zip格式的文件" config-sh="mod_zip" >
+	<page title="Magisk	模块查找" desc="查找所有带有	.zip	格式的文件" config-sh="mod_zip" >
 		<handler>mod_all_zip &#34;\$file&#34;</handler>
 		<menu type="refresh">刷新界面</menu>
 		<menu type="exit">关闭页面</menu>
@@ -1926,7 +1929,7 @@ cat <<-CCAEO
 		<option type="file" suffix="zip">安装本地模块</option>
 		<option type="file" style="fab" suffix="zip">安装本地模块</option>
 	</page>
-	<page title="Magisk模块管理" config-sh="mod_xml" >
+	<page title="Magisk	模块管理" config-sh="mod_xml" >
 		<handler>mod_all_zip &#34;\$file&#34;</handler>
 		<menu type="refresh">刷新界面</menu>
 		<menu type="exit">关闭页面</menu>
@@ -1934,7 +1937,7 @@ cat <<-CCAEO
 		<option type="file" suffix="zip">安装本地模块</option>
 		<option type="file" style="fab" suffix="zip">安装本地模块</option>
 	</page>
-	<page title="Magisk模块仓库" before-load="mod_git" load-fail="git_fail \$XML/http_mod.XML \$MOD_HTTP" config-sh="cat \$XML/http_mod.XML" >
+	<page title="Magisk	模块仓库" before-load="mod_git" load-fail="git_fail \$XML/http_mod.XML \$MOD_HTTP" config-sh="cat \$XML/http_mod.XML" >
 		<handler>mod_all_zip &#34;\$file&#34;</handler>
 		<menu type="refresh">刷新界面</menu>
 		<menu type="exit">关闭页面</menu>
@@ -1942,19 +1945,19 @@ cat <<-CCAEO
 		<option type="file" suffix="zip">安装本地模块</option>
 		<option type="file" style="fab" suffix="zip">安装本地模块</option>
 	</page>
-	<page title="LSPosed模块仓库" before-load="lsp_git" load-fail="git_fail \$XML/http_lsp.XML \$LSP_HTTP" config-sh="cat \$XML/http_lsp.XML" >
+	<page title="LSPosed	模块仓库" before-load="lsp_git" load-fail="git_fail \$XML/http_lsp.XML \$LSP_HTTP" config-sh="cat \$XML/http_lsp.XML" >
 		<handler>CQ</handler>
 		<menu type="refresh">刷新界面</menu>
 		<menu type="exit">关闭页面</menu>
 		<option type="default" id="1">重启手机</option>
 	</page>
-	<page title="Xposed模块仓库" desc="加载时间可能会在2分钟左右" before-load="xp_git" load-fail="git_fail \$XML/http_xp.XML \$XP_HTTP" config-sh="cat \$XML/http_xp.XML" >
+	<page title="Xposed	模块仓库" desc="加载时间可能会在2分钟左右" before-load="xp_git" load-fail="git_fail \$XML/http_xp.XML \$XP_HTTP" config-sh="cat \$XML/http_xp.XML" >
 		<handler>CQ</handler>
 		<menu type="refresh">刷新界面</menu>
 		<menu type="exit">关闭页面</menu>
 		<option type="default" id="1">重启手机</option>
 	</page>
-	<page title="获取GitHub的Release" desc="仅支持获取最新Latest版本" config-sh="git_xml" >
+	<page title="获取	GitHub	的	Release" desc="仅支持获取最新	Latest	版本" load-fail=":>\$APP_DOWN/git_release.ini" config-sh="git_xml" >
 		<handler>CQ</handler>
 		<menu type="refresh">刷新界面</menu>
 		<menu type="exit">关闭页面</menu>
@@ -1987,19 +1990,19 @@ cat <<-CCAEO
 		<option type="default" id="1">重启手机</option>
 	</page>
 	<action title="命令执行" >
-		<param name="run_shell" title="可通过iavc -s 命令，去查找命令是否存在" desc="已输入命令占用大小：`file_size $RUN/run_shell.sh`" value-sh="cat \$RUN/run_shell.sh"/>
+		<param name="run_shell" title="可通过	iavc -s	命令，去查找命令是否存在" desc="已输入命令占用大小：`file_size $RUN/run_shell.sh`" value-sh="cat \$RUN/run_shell.sh"/>
 		<set>run_shell</set>
 	</action>
 	<text>
 		<slices>
 			<slice>				</slice>
-			<slice run="am force-stop \$APP_NA" color="`ff_ys`" size="15" u="1">退出应用</slice>
+			<slice run="am force-stop \$APP_NA" color="`ff_ys`" size="15">退出应用</slice>
 			<slice>				</slice>
-			<slice run="am start -S \$APP_NA/com.projectkr.shell.SplashActivity" size="15" color="`ff_ys`" u="1">重启应用</slice>
+			<slice run="am start -S \$APP_NA/com.projectkr.shell.SplashActivity" size="15" color="`ff_ys`">重启应用</slice>
 			<slice>				</slice>
-			<slice run="pm clear \$APP_NA &#38;&#38; am start -S \$APP_NA/com.projectkr.shell.SplashActivity" size="15" color="`ff_ys`" u="1">重置应用</slice>
+			<slice run="pm clear \$APP_NA &#38;&#38; am start -S \$APP_NA/com.projectkr.shell.SplashActivity" size="15" color="`ff_ys`">重置应用</slice>
 			<slice>				</slice>
-			<slice run=". \$APP_PATH/exit.sh" size="15" color="`ff_ys`" u="1">结束进程</slice>
+			<slice run=". \$APP_PATH/exit.sh" size="15" color="`ff_ys`">结束进程</slice>
 		</slices>
 	</text>
 </group>
@@ -2011,7 +2014,7 @@ test_xml
 }
 _mod() {
 export MOD=`iavc -i magisk`
-[[ -z $MOD ]] && abort "未安装Magisk"
+[[ -z $MOD ]] && abort "未安装	Magisk"
 export MOD_V=`$MOD -v | sed 's/:.*//g'`
 export MOD_VC=`$MOD -V`
 unset mod_dir mod_diru mod_di mod_mo mod_re mod_up mod_mp mod_ph mod_sh mod_sp mod_uh mod_vn mod_vc
@@ -2110,7 +2113,7 @@ then if [[ `md5sum2 "$down_file"` = $down_md5 ]]
 elif [[ -n $down_size ]]
 then if [[ `stat -c %s "$down_file" 2>/dev/null` = $down_size ]]
 	then error "！已下载	${down_file##*/}，大小对比(不确认)"
-		return 0
+#		return 0
 	fi
 fi
 {
@@ -2119,8 +2122,8 @@ w_n
 {
 if [[ "`ip r sh dev tun0 2>/dev/null`" = *tun0* ]]
 then if curl -s -I --connect-timeout 3 "google.com" | fgrep -q 'HTTP'
-	then error "- 已开启并连接　ⱱƥŋ"
-	else error "- 已开启未连接　ⱱƥŋ"
+	then error "- 已开启并连接	　ⱱƥŋ"
+	else error "- 已开启未连接	　ⱱƥŋ"
 	fi
 fi
 }&
@@ -2179,12 +2182,16 @@ do _XCW=`cat $XCW`
 	fi
 done
 }
-url_lzy() {
-local VERSION MODEL Chrome _UA _url_lzy urlpt link
+url_ua() {
+local VERSION MODEL Chrome
 VERSION="`getprop ro.build.version.release`"
 MODEL="`getprop ro.product.model`"
 Chrome=`app_vn com.google.android.webview`
-_UA="-A 'Mozilla/5.0 (Linux; Android ${VERSION:-11}; ${MODEL:-M2012K11AC}) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/$Chrome Mobile Safari/537.36'"
+echo -e "-A 'Mozilla/5.0 (Linux; Android ${VERSION:-11}; ${MODEL:-M2012K11AC}) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/$Chrome Mobile Safari/537.36'"
+}
+url_lzy() {
+local _UA _url_lzy urlpt link
+_UA="`url_ua`"
 eval "`curl -s -k -L --connect-timeout 10 "https://lanzou.com/$@" | sed -n 's/.*?<br>/_url_lzy="/p' | sed 's/ +.*//g'`"
 _url_lzy="${_url_lzy:-https://lanzoux.com}"
 eval "`curl -s -k -L --connect-timeout 10 "$_UA" -e "$_url_lzy/$@" "$_url_lzy/tp/$@" | sed -n "/^var domianload = 'h/p; /^var downloads = '?/p" | sed -e 's/.*domianload = /urlpt=/g' -e 's/.*downloads = /link=/g' -e 's/ \/\/var.*//g'`"
@@ -2266,7 +2273,7 @@ MK $XBIN $BBIN; w_n
 busybox=$BBIN/busybox
 eval `CURL -s -L --connect-timeout 10 "https://by-han.coding.net/p/Han/d/busybox-ndk/git/raw/master/module.prop" | egrep '^version.*='`
 if [[ -z "$versionCode" ]]
-then error "！加载busybox失败"
+then error "！加载	busybox	失败"
 	return 1
 fi
 export ABI=`getprop ro.product.cpu.abi`
@@ -2278,7 +2285,7 @@ x86_64*) TYPE="busybox-x86_64-selinux";;
 x86*) TYPE="busybox-x86-selinux";;
 mips64*) TYPE="busybox-mips64";;
 mips*) TYPE="busybox-mips";;
-*) error "！未知的架构	${ABI}，无法安装busybox"; return 1;;
+*) error "！未知的架构	${ABI}，无法安装	busybox"; return 1;;
 esac
 if [[ `cat $INI/busybox.ini 2>/dev/null | cut -d '-' -f2` != $versionCode ]]
 then if XZ -# "https://by-han.coding.net/p/Han/d/busybox-ndk/git/raw/master/$TYPE" $TMP/$TYPE
@@ -2422,7 +2429,7 @@ cat <<-CCAEO >/cache/recovery/openrecoveryscript
 install $rom_zip
 reboot
 CCAEO
-echo "- 5秒后自动重启到recovery"
+echo "- 5秒后自动重启到	recovery"
 for i in $(seq 5 -1 1)
 do echo "progress:[$i/5]"
 	echo $i
@@ -2492,7 +2499,7 @@ CCAEO
 fi
 done
 if [[ -z $M ]]
-then txml -g -s 50 '未查找到ROM'
+then txml -g -s 50 '未查找到	ROM'
 	return $$
 fi
 }
@@ -2539,7 +2546,7 @@ cat <<-CCAEO
 $group
 	<text>
 		<slices>
-			<slice activity="$APP_AP" $align size="${size:-15}" color="`ff_ys`" u="1">$@</slice>
+			<slice activity="$APP_AP" $align size="${size:-15}" color="`ff_ys`">$@</slice>
 		</slices>
 	</text>
 $_group
@@ -2569,12 +2576,14 @@ fi
 }
 mod_xml() {
 S_T; trap 'E_T -t 加载Magisk模块管理' EXIT; cxml
-for mod in $MOD_DIR/*
-do ((M++))
+for m in $MOD_DIR/*; do ((i++)); done
+txml -a -g -s 25 "模块已安装有（$i）"
+for mod in $MOD_DIR/*; do
+((M++))
 _mod "$mod"
 eval `mod_grep "$mod"`
 cat <<-CCAEO
-<group title="$M" >
+<group title="$M">
 	<action title="$name" auto-off="true" id="@${mod##*/}" reload="@${mod##*/}" >
 		<set>mod_qjx &#34;$mod&#34;</set>
 		<desc>id：$id&#x000A;作者：$author&#x000A;版本：$version&#x000A;版本号：$versionCode&#x000A;模块路径：$mod&#x000A;模块说明：$description</desc>
@@ -2589,11 +2598,11 @@ mod_all_zip() {
 [[ $menu_id = 1 ]] && CQ 1
 mod_file="$@"
 export MOD=`iavc -i magisk`
-[[ -z $MOD ]] && abort "未安装Magisk"
+[[ -z $MOD ]] && abort "未安装	Magisk"
 export MOD_V=`$MOD -v | sed 's/:.*//g'`
 export MOD_VC=`$MOD -V`
 error "- Magisk版本：$MOD_V（$MOD_VC）"
-error -n "- Magisk包名"
+error -n "- Magisk包名	"
 [[ -d $DA_DIR/com.topjohnwu.magisk ]] && mod_name=com.topjohnwu.magisk
 [[ -z $mod_name ]] && mod_name=`magisk --sqlite "SELECT value FROM strings WHERE key='requester'" | cut -d= -f2`
 [[ -z $mod_name ]] && mod_name=`strings /data/adb/magisk.db | sed -rn 's/^.?requester//p'`
@@ -2601,14 +2610,14 @@ error -n "- Magisk包名"
 [[ -f "$mod_file" ]] || abort "文件不存在"
 if unzip -p "$mod_file" 'META-INF/com/google/android/updater-script' | egrep -q '^#MAGISK$'
 then
-	unzip -l "$mod_file" | fgrep -q 'module.prop' || error "！未发现module.prop文件无法确认Magisk模块"
+	unzip -l "$mod_file" | fgrep -q 'module.prop' || error "！未发现	module.prop	文件无法确认	Magisk	模块"
 	exec 3>&2
 	exec 2>$TMP/${mod_file##*/}.LOG
 	[[ -d $TMP/magisk_all ]] || MK $TMP/magisk_all
 	unzip -p "$mod_file" 'META-INF/com/google/android/update-binary' &>$TMP/magisk_all/update-binary
 	if [[ -s $TMP/magisk_all/update-binary ]]
 	then if unzip -l "$mod_file" | sed -n 's/.* //p' | egrep -q '^config.sh$'
-		then echo "- 发现config.sh脚本"
+		then echo "- 发现	config.sh	脚本"
 			abort "不支持安装旧模块"
 			#mod_all_20100 "$TMP/magisk_all/mod_all_20100.sh" && sed -i "s#/data/adb/magisk/util_functions#$TMP/magisk_all/mod_all_20100#g; s#MAGISKBIN=/data/adb/magisk#MAGISKBIN=$TMP/magisk_all#g; s#util_functions#mod_all_20100#g" $TMP/magisk_all/update-binary || abort "暂时不支持安装旧模块"
 		fi
@@ -2619,7 +2628,7 @@ then
 		[[ ${_rm:-0} = 1 ]] && rm -f "$mod_file"
 		error "ȨŅḐ"
 	fi
-else abort "不是Magisk模块，无法安装"
+else abort "不是	Magisk	模块，无法安装"
 fi
 }
 MK() {
