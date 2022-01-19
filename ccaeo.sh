@@ -6,35 +6,6 @@ export APP_URL="https://some6508.github.io"
 export APP_GIT="https://git.ccaeo.workers.dev/"
 export APP_DEV="https://url.ccaeo.workers.dev/?url="
 export APP_AP="com.projectkr.shell.ActionPage"
-if [[ -n $data_MD5 ]]; then
-export SOME=true
-export APP_NA=$Package_Name
-export APP_UER=$Apk_UID
-export APP_SDK=$SDK
-export APP_VN="$Version_Name"
-export APP_VC=$Version_Code
-export APP_UID=$User_Id
-export APP_ROOT=$Have_ROOT
-export SD_DIR=$SD_PATH
-export APP_TMP=$Cache_Dir
-export APP_PATH=$TOOLKIT
-export APP_EXE=$Run_PATH
-export DA_DIR=$USER_DIR
-export RUN=$HOME/run
-export INI=$RUN/ini
-export TMP=$RUN/tmp
-export XML=$RUN/xml
-export PAGE=$XML
-export CCAEO=$RUN/ccaeo.sh
-export BIN=$APP_PATH/bin
-export PREFIX=$RUN/usr
-export ABIN=$PREFIX/bin
-export SBIN=$PREFIX/sbin
-export XBIN=$PREFIX/xbin
-export BBIN=$PREFIX/busybox
-export PATH="${ABIN}:${SBIN}:${BIN}:${XBIN}:${PATH0}:${BBIN}"
-[[ -d $RUN ]] && cd $RUN
-fi
 export APP_DOWN=$SD_DIR/Download/$APP_NA
 export MOD_DIR=/data/adb/modules
 export XCW=$TMP/XCW.ini
@@ -52,7 +23,7 @@ export SCRIPT="$APP_PATH"
 export TOOLKIT="$APP_PATH"
 export Data_Dir="$INI"
 [[ -d $TMP ]] && SET=true || SET=false
-$SET && set -x 2>$TMP/CCAEO.LOG && export PS4='$LINENO:	${FUNCNAME[0]}'
+$SET && set -x 2>$TMP/CCAEO.LOG && export PS4='$0	$LINENO:	${FUNCNAME[0]}'
 #$SET && exec 2>$TMP/CCAEO.LOG && set -x && export PS4='$LINENO: '
 if [[ -f $INI/cdn.ini ]]; then
 	export cdn=1
