@@ -2045,14 +2045,7 @@ fi
 {
 w_n
 [[ -z $down_size ]] && JH='-#' || { JH='-s'; _JH='-q'; }
-{
-if [[ "`ip r sh dev tun0 2>/dev/null`" = *tun0* ]]
-then if curl -s -I --connect-timeout 3 "google.com" | fgrep -q 'HTTP'
-	then error "- 已开启并连接	　ⱱƥŋ"
-	else error "- 已开启未连接	　ⱱƥŋ"
-	fi
-fi
-}&
+#vpn &
 DOWN $JH -k -L --connect-timeout 10 -o "$down_file" "$down_url"
 [[ $? = 0 ]] || { CURL $JH -k -L --connect-timeout 10 -o "$down_file" "$down_url"; }
 [[ $? = 0 ]] || { WGET $_JH --no-check-certificate -T 10 -O "$down_file" "$down_url"; }
@@ -2104,7 +2097,14 @@ do _XCW=`cat $XCW`
 		_ZZ="$_Z"
 	fi
 done
-wait
+}
+vpn() {
+if [[ "`ip r sh dev tun0 2>/dev/null`" = *tun0* ]]
+then if curl -s -I --connect-timeout 3 "google.com" | fgrep -q 'HTTP'
+	then error "- 已开启并连接	　ⱱƥŋ"
+	else error "- 已开启未连接	　ⱱƥŋ"
+	fi
+fi
 }
 url_ua() {
 local VERSION MODEL Chrome
