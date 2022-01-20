@@ -2242,6 +2242,7 @@ then . $SH_DOWN sbin -down
 else
 	echo "- 跳过资源"
 fi
+wait
 echo "- 设置权限"
 for bin in unzip ip
 do [[ -e $XBIN/$bin ]] || ln -sf $busybox $XBIN/$bin
