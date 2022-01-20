@@ -2043,7 +2043,7 @@ then if [[ `stat -c %s "$down_file" 2>/dev/null` = $down_size ]]
 	fi
 fi
 {
-w_n; vpn &
+w_n; #vpn &
 [[ -z $down_size ]] && JH='-#' || { JH='-s'; _JH='-q'; }
 DOWN $JH -k -L --connect-timeout 10 -o "$down_file" "$down_url"
 [[ $? = 0 ]] || { CURL $JH -k -L --connect-timeout 10 -o "$down_file" "$down_url"; }
@@ -2096,7 +2096,6 @@ do _XCW=`cat $XCW`
 		_ZZ="$_Z"
 	fi
 done
-wait
 }
 vpn() {
 if [[ "`ip r sh dev tun0 2>/dev/null`" = *tun0* ]]
