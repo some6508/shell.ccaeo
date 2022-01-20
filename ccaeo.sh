@@ -2043,9 +2043,8 @@ then if [[ `stat -c %s "$down_file" 2>/dev/null` = $down_size ]]
 	fi
 fi
 {
-w_n
+w_n; vpn &
 [[ -z $down_size ]] && JH='-#' || { JH='-s'; _JH='-q'; }
-#vpn &
 DOWN $JH -k -L --connect-timeout 10 -o "$down_file" "$down_url"
 [[ $? = 0 ]] || { CURL $JH -k -L --connect-timeout 10 -o "$down_file" "$down_url"; }
 [[ $? = 0 ]] || { WGET $_JH --no-check-certificate -T 10 -O "$down_file" "$down_url"; }
@@ -2097,6 +2096,7 @@ do _XCW=`cat $XCW`
 		_ZZ="$_Z"
 	fi
 done
+wait
 }
 vpn() {
 if [[ "`ip r sh dev tun0 2>/dev/null`" = *tun0* ]]
@@ -2555,4 +2555,3 @@ for MK in $@
 do [[ -d "$MK" ]] || mkdir -p "$MK"
 done
 }
-wait
