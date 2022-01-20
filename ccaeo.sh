@@ -2554,3 +2554,4 @@ for MK in $@
 do [[ -d "$MK" ]] || mkdir -p "$MK"
 done
 }
+wait
