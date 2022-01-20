@@ -2228,7 +2228,7 @@ fi
 if [[ ${dm:-0} != "`md5sum2 $SH_DOWN`" ]]
 then DOWN -# -k -L --connect-timeout 10 -o $SH_DOWN $CODING/down.sh
 fi
-if [[ "`cat $INI/sbin.ini 2>/dev/null`" != $s ]]
+if [[ "`cat $INI/sbin.ini 2>/dev/null`" != ${s:-0} ]]
 then . $SH_DOWN sbin -down
 	echo "- 释放资源"
 	if tar -xzf $TMP/sbin -C $PREFIX
@@ -2239,6 +2239,8 @@ then . $SH_DOWN sbin -down
 		echo $s >$INI/sbin.ini
 	else abort "释放失败"
 	fi
+else
+	echo "- 跳过资源"
 fi
 echo "- 设置权限"
 for bin in unzip ip
