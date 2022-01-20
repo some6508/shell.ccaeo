@@ -2229,7 +2229,7 @@ fi
 if [[ ${dm:-0} != "`md5sum2 $SH_DOWN`" ]]
 then DOWN -# -k -L --connect-timeout 10 -o $SH_DOWN $CODING/down.sh
 fi
-if [[ "`cat $INI/sbin.ini 2>/dev/null`" != ${s:-0} ]]
+if [[ "`cat $INI/sbin.ini 2>/dev/null`" != $s ]]
 then . $SH_DOWN sbin -down
 	echo "- 释放资源"
 	if tar -xzf $TMP/sbin -C $PREFIX
