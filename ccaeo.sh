@@ -23,7 +23,7 @@ export SCRIPT="$APP_PATH"
 export TOOLKIT="$APP_PATH"
 export Data_Dir="$INI"
 [[ -d $TMP ]] && SET=true || SET=false
-$SET && :>$TMP/CCAEO.LOG && set -x 2>>$TMP/CCAEO.LOG && export PS4='$LINENO:	${FUNCNAME[0]}'
+$SET && set -x 2>$TMP/CCAEO.LOG && export PS4='$LINENO:	${FUNCNAME[0]}'
 #$SET && exec 2>$TMP/CCAEO.LOG && set -x && export PS4='$LINENO: '
 if [[ -f $INI/cdn.ini ]]; then
 	export cdn=1
@@ -1122,14 +1122,46 @@ then for i in ${package//,/ }
 fi
 }
 git_cat() {
+
 cat <<-CCAEO >$APP_DOWN/git_release.ini
 $git_xml
 CCAEO
-[[ $_git = 1 ]] && echo "$git_http" >$APP_DOWN/git_release.ini
+[[ $_git = 1 || $_git ]] && echo "$git_http" >$APP_DOWN/git_release.ini
 }
 git_xml() {
 S_T; trap 'E_T -t 加载Release' EXIT; cxml
 txml -g '获取失败原因（可能）：&#x000A;1、连接超过10秒为超时。2、没有获取到Release。3、链接输入错误？'
+if $SOME; then
+cat <<-CCAEO
+,{
+	"Actions": {
+		"title": "获取链接	Release",
+		"desc": "仅支持带有CDN加速下载的选项",
+		"shell": "git_cat",
+		"params": [
+			{
+				"name": "git_http",
+				"label": "已收集有",
+				"type": "choose",
+				"options-sh": "git_http"
+			},
+			{
+				"name": "_git",
+				"label": "使用收集？",
+				"type": "switch"
+			},
+			{
+				"name": "git_xml",
+				"label": "请输入",
+				"type": "EditText",
+				"desc": "后面的	releases	可以不加",
+				"value-sh": "cat \$APP_DOWN/git_release.ini"
+			}
+		]
+	}
+}
+CCAEO
+else
 cat <<-CCAEO
 <group>
 	<action title="获取链接	Release" reload="true" auto-off="true" >
@@ -1142,9 +1174,11 @@ cat <<-CCAEO
 	</action>
 </group>
 CCAEO
+fi
 for i in `cat $APP_DOWN/git_release.ini | fgrep -v '#'`
 do git_api "$i"
 done
+$SOME && echo ]
 }
 git_url() {
 cat <<CCAEO
@@ -1178,6 +1212,26 @@ if [[ -z $release ]]; then
 	return $$
 fi
 eval "$release"
+if $SOME; then
+cat <<-CCAEO
+,{
+	"Actions": {
+		"title": "${1##*/}",
+		"shell": "git_xz \$releases",
+		"params": [
+			{
+				"name": "body",
+				"title": "版本日志",
+				"type": "EditText",
+				"value": "`xml_cat "${body:-无日志}"`"
+			},
+			{
+				"name": "releases",
+				"label": "Release",
+				"type": "Spinner",
+				"options": [
+CCAEO
+else
 cat <<-CCAEO
 <group>
 	<action title="${1##*/}" >
@@ -1186,18 +1240,55 @@ cat <<-CCAEO
 			<param name="body" title="版本日志" value="`xml_cat "${body:-无日志}"`" />
 			<param name="releases" label="Release" >
 CCAEO
+fi
 for i in `echo "$release" | egrep -v 'tag_name|updated_at'`
 do if [[ "$i" = browser_download_url* ]]
 	then eval "$i $a"
 		((n++))
+		if $SOME; then
+		cat <<-CCAEO
+					"$browser_download_url $size|$n、${browser_download_url##*/}",
+		CCAEO
+		else
 		cat <<-CCAEO
 				<option value="$browser_download_url $size">$n、${browser_download_url##*/}</option>
 		CCAEO
+		fi
 		unset a size browser_download_url
 	else
 		a="$i"
 	fi
 done
+if $SOME; then
+cat <<-CCAEO
+					"$browser_download_url $size|$n、${browser_download_url##*/}"
+				]
+			},
+			{
+				"name": "xz",
+				"title": "注意：下载安装仅支持	APK	和	Magisk	模块",
+				"label": "选项",
+				"type": "Spinner",
+				"options-sh": "echo '1|下载安装\n2|仅下载'"
+			},
+			{
+				"name": "_rm",
+				"label": "下载安装后删除文件",
+				"type": "switch"
+			},
+			{
+				"name": "_js",
+				"label": "使用CDN加速下载",
+				"type": "switch",
+				"value": "$cdn"
+			}
+		],
+		"desc": "最新版本：$tag_name·共有：$n个",
+		"summary": "- 上传时间：`_time -tz $updated_at`"
+	}
+}
+CCAEO
+else
 cat <<-CCAEO
 			</param>
 			<param name="xz" label="选项" title="注意：下载安装仅支持	APK	和	Magisk	模块" options-sh="echo '1|下载安装\n2|仅下载'" />
@@ -1209,6 +1300,7 @@ cat <<-CCAEO
 	</action>
 </group>
 CCAEO
+fi
 }
 git_xz() {
 [[ -z "$1" ]] && abort "未选择	Release"
