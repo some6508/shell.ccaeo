@@ -2016,6 +2016,7 @@ esac
 #fi
 }
 ccaeo_vc() {
+_run $APP_PATH/run.sh
 _run $RUN/url.sh
 A() {
 [[ -e $APP_TMP/update ]] || echo "！未初始化加载配置\n，请前往主页重新加载"
